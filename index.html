@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title>Angular Field Validation</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body ng-app="myApp">
+
+  <main role="main" ng-controller="myController">
+    <h1>Angular Field Validation</h1>
+
+    <form name="myForm">
+      <div field-validation>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" ng-model="form.name" required />
+      </div>
+      <div field-validation>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" ng-model="form.email" required />
+      </div>
+      <div field-validation>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" ng-model="form.pass" required />
+      </div>
+      <div field-validation error-Texts="{min: 'You should 6 to ride..'}">
+        <label for="age">Age</label>
+        <input id="age" name="age" type="number" ng-model="form.age" min="6" />
+      </div>
+      <div field-validation>
+        <label for="comment">Comment</label>
+        <textarea id="comment" name="comment" ng-model="form.comment" required ng-minlength="20" ng-maxlength="30" rows="5"></textarea>
+      </div>
+      <div>
+        <input type="submit" value="Submit" ng-disabled="myForm.$invalid">
+      </div>
+    </form>
+
+  </main>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.24/angular.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+
+  <script type="text/javascript" src="js/angular-field-validation.js"></script>
+  <script type="text/javascript" src="js/application.js"></script>
+
+</body>
+</html>
