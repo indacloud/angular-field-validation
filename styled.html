@@ -1,0 +1,106 @@
+<html>
+<head>
+  <title>Styled Angular Field Validation</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/better_style.css">
+</head>
+<body ng-app="myApp">
+
+  <main role="main" ng-controller="myController">
+    <h1>Styled Angular Field Validation</h1>
+
+    <form name="myForm">
+      <div class="row">
+        <div field-validation>
+          <label for="name">Name</label>
+          <input id="name" autocomplete="off" name="name" type="text" ng-model="form.name" required />
+        </div>
+        <div class="info">A regular required input</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation>
+          <label for="email">Email</label>
+          <input id="email" autocomplete="off" name="email" type="email" ng-model="form.email" ng-required="emailRequired" />
+        </div>
+        <div class="info">Required email validation</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" ng-model="form.pass" required />
+        </div>
+        <div class="info">A regular required password input</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation error-texts="{min: 'You should 6 to ride..'}">
+          <label for="age">Age</label>
+          <input id="age" name="age" type="number" ng-model="form.age" min="6" />
+        </div>
+        <div class="info">A numeric input with min validation and custom error message</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation>
+          <label for="comment">Comment</label>
+          <textarea id="comment" name="comment" ng-model="form.comment" required ng-minlength="20" ng-maxlength="30" rows="5"></textarea>
+        </div>
+        <div class="info">textarea with minlength and maxlength</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation>
+          <div class="checkbox">
+            <div class="label">Do you like banana?</div>
+            <label>
+              <input type="checkbox" name="likeBanana" ng-model="user.likeBanana" required>
+              <div class="label-text">
+                Like babana
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="info">Required checkbox</div class="info">
+      </div>
+      <div class="row">
+        <div field-validation>
+          <div class="label">Gender</div>
+          <div class="radio-inline">
+            <label>
+              <input type="radio" name="gender" ng-model="user.gender" value="male" required>
+              <div class="label-text">Male</div>
+            </label>
+          </div>
+          <div class="radio-inline">
+            <label>
+              <input type="radio" name="gender" ng-model="user.gender" value="female" required>
+              <div class="label-text">Female</div>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div field-validation>
+          <label for="country">Country</label>
+          <select id="country" name="country" required ng-model="user.country">
+            <option></option>
+            <option>USA</option>
+            <option>Canada</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div clss="row">
+        <div>
+          <input type="submit" value="Submit" ng-click="onSubmit()" ng-disabled="myForm.$invalid">
+        </div>
+      </div>
+    </form>
+
+  </main>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.24/angular.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <script type="text/javascript" src="js/angular-field-validation.js"></script>
+  <script type="text/javascript" src="js/application.js"></script>
+
+</body>
+</html>

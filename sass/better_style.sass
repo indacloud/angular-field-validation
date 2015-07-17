@@ -1,0 +1,103 @@
+@import checkboxes
+
+form
+  input,
+  select
+    border-width: 0px 0px 2px 0px
+    border-color: #EEE
+    border-style: solid
+    padding: 5px 25px 5px 5px
+    font-size: 1em
+    &:focus,
+    &:active
+      outline: 0
+      border-color: orange
+    &.ng-invalid:not(.ng-pristine)
+      border-color: red
+
+  textarea
+    border-width: 0px 0px 2px 2px
+    border-color: #EEE
+    border-style: solid
+    padding: 5px 20px 5px 5px
+    font-size: 1em
+    font-family: Helvetica, Arial, sans-serif
+    &:focus,
+    &:active
+      outline: 0
+      border-color: orange
+    &.ng-invalid:not(.ng-pristine)
+      border-color: red
+
+  input[type="submit"]
+    border: 1px solid gray
+    border-radius: 3px
+    background: whitesmoke
+    padding: 5px 10px
+    margin: 10px 0
+    transition: all 0.3s ease-in-out
+    &:hover,
+    &:focus
+      background: darken(whitesmoke, 20)
+    &[disabled]
+      opacity: 0.7
+      cursor: not-allowed
+
+  [field-validation]
+    position: relative
+    margin-top: 1em
+    label
+      position: absolute
+      padding: 5px
+      top: 0
+      transition: all 0.3s ease-in-out
+      color: gray
+    .label
+      padding: 0px 5px
+      color: gray
+      transition: all 0.3s ease-in-out
+    .checkbox,
+    .checkbox-inline,
+    .radio,
+    .radio-inline
+      label
+        position: relative
+        color: inherit
+    &.dirty,
+    &.has-focus
+      label
+        top: -1.6em
+        font-size: 0.8em
+      .checkbox,
+      .checkbox-inline,
+      .radio,
+      .radio-inline
+        label
+          top: 0
+          font-size: 1em
+    &.has-focus
+      label
+      .label
+        color: orange
+      .checkbox,
+      .checkbox-inline,
+      .radio,
+      .radio-inline
+        label
+          color: inherit
+    &.invalid
+      &::after
+        content: url(../icons/SVG/report_problem.svg)
+        display: block
+        height: 1em
+        width: 1em
+        position: absolute
+        top: 3px
+        right: 10px
+      .checkbox,
+      .checkbox-inline,
+      .radio,
+      .radio-inline
+        .label-text
+          color: red
+

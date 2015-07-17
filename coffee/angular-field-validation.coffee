@@ -1,7 +1,7 @@
 fieldValidation = angular.module 'fieldValidation', []
 
 fieldValidation.service 'fieldValidationSvc', [ ->
-  defaultTexts =
+  messages =
     required:  'This field is required'
     email:     'Enter a valid email address'
     max:       'Should be lower'
@@ -15,11 +15,17 @@ fieldValidation.service 'fieldValidationSvc', [ ->
   notificationElt = '<span class="notification">'
 
   return{
-    getTexts: ->
-      defaultTexts
+    getMessages: ->
+      messages
+
+    setMessages: (newMessages)->
+      messages = angular.extend messages, newMessages
 
     getNotificationElt: ->
       $(notificationElt)
+
+    setNotificationElt: (elt)->
+      notificationElt = elt
 
   }
 ]
@@ -53,7 +59,7 @@ fieldValidation.directive 'fieldValidation', ['fieldValidationSvc', (fieldValida
         else
           notificationElt.text formatErrors()
 
-      texts = angular.extend fieldValidationSvc.getTexts(), $scope.errorTexts
+      texts = angular.extend fieldValidationSvc.getMessages(), $scope.errorTexts
 
       input = $(element).find '[ng-model]'
       throw 'fieldValidation - ngModel required' unless input.length
@@ -72,6 +78,11 @@ fieldValidation.directive 'fieldValidation', ['fieldValidationSvc', (fieldValida
         updateValidity()
 
       $scope.$watch (-> inputCtrl.$viewValue), updateValidity
+
+      input.on 'focusin', (ev)->
+        $(element).addClass 'has-focus'
+      input.on 'focusout', (ev)->
+        $(element).removeClass 'has-focus'
 
   }
 ]

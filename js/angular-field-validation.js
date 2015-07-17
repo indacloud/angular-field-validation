@@ -5,8 +5,8 @@
 
   fieldValidation.service('fieldValidationSvc', [
     function() {
-      var defaultTexts, notificationElt;
-      defaultTexts = {
+      var messages, notificationElt;
+      messages = {
         required: 'This field is required',
         email: 'Enter a valid email address',
         max: 'Should be lower',
@@ -19,11 +19,17 @@
       };
       notificationElt = '<span class="notification">';
       return {
-        getTexts: function() {
-          return defaultTexts;
+        getMessages: function() {
+          return messages;
+        },
+        setMessages: function(newMessages) {
+          return messages = angular.extend(messages, newMessages);
         },
         getNotificationElt: function() {
           return $(notificationElt);
+        },
+        setNotificationElt: function(elt) {
+          return notificationElt = elt;
         }
       };
     }
@@ -64,7 +70,7 @@
               return notificationElt.text(formatErrors());
             }
           };
-          texts = angular.extend(fieldValidationSvc.getTexts(), $scope.errorTexts);
+          texts = angular.extend(fieldValidationSvc.getMessages(), $scope.errorTexts);
           input = $(element).find('[ng-model]');
           if (!input.length) {
             throw 'fieldValidation - ngModel required';
@@ -84,9 +90,15 @@
           $scope.$on('VALIDATE_FIELDS', function() {
             return updateValidity();
           });
-          return $scope.$watch((function() {
+          $scope.$watch((function() {
             return inputCtrl.$viewValue;
           }), updateValidity);
+          input.on('focusin', function(ev) {
+            return $(element).addClass('has-focus');
+          });
+          return input.on('focusout', function(ev) {
+            return $(element).removeClass('has-focus');
+          });
         }
       };
     }
