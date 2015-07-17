@@ -10,7 +10,7 @@
         scope: {
           errorTexts: '=',
           useDataAttribute: '=',
-          appendNotificationTo: '@'
+          appendNotificationTo: '='
         },
         link: function($scope, element, attrs, formCtrl) {
           var defaultTexts, formatErrors, input, inputCtrl, label, notificationContainer, notificationElt, texts, updateValidity;

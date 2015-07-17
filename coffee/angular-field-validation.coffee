@@ -6,7 +6,7 @@ fieldValidation.directive 'fieldValidation', [ ->
     scope:
       errorTexts: '='
       useDataAttribute: '='
-      appendNotificationTo: '@'
+      appendNotificationTo: '='
 
     link: ($scope, element, attrs, formCtrl)->
 
