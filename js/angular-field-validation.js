@@ -3,8 +3,34 @@
 
   fieldValidation = angular.module('fieldValidation', []);
 
-  fieldValidation.directive('fieldValidation', [
+  fieldValidation.service('fieldValidationSvc', [
     function() {
+      var defaultTexts, notificationElt;
+      defaultTexts = {
+        required: 'This field is required',
+        email: 'Enter a valid email address',
+        max: 'Should be lower',
+        maxlength: 'Too long',
+        min: 'Should be higher',
+        minlength: 'Too short',
+        number: 'Should be numeric',
+        pattern: 'Should respect the pattern',
+        url: 'Enter a valid url'
+      };
+      notificationElt = '<span class="notification">';
+      return {
+        getTexts: function() {
+          return defaultTexts;
+        },
+        getNotificationElt: function() {
+          return $(notificationElt);
+        }
+      };
+    }
+  ]);
+
+  fieldValidation.directive('fieldValidation', [
+    'fieldValidationSvc', function(fieldValidationSvc) {
       return {
         require: '^form',
         scope: {
@@ -13,23 +39,12 @@
           appendNotificationTo: '='
         },
         link: function($scope, element, attrs, formCtrl) {
-          var defaultTexts, formatErrors, input, inputCtrl, label, notificationContainer, notificationElt, texts, updateValidity;
-          defaultTexts = {
-            required: 'This field is required',
-            email: 'Enter a valid email address',
-            max: 'Should be lower',
-            maxlength: 'Too long',
-            min: 'Should be higher',
-            minlength: 'Too short',
-            number: 'Should be numeric',
-            pattern: 'Should respect the pattern',
-            url: 'Enter a valid url'
-          };
-          notificationElt = $('<span class="notification">');
+          var formatErrors, input, inputCtrl, notificationContainer, notificationElt, texts, updateValidity;
+          notificationElt = fieldValidationSvc.getNotificationElt();
           formatErrors = function() {
             var errors;
             errors = [];
-            _.each(inputCtrl.$error, function(value, key) {
+            angular.forEach(inputCtrl.$error, function(value, key) {
               if (value) {
                 return errors.push(texts[key]);
               }
@@ -37,7 +52,9 @@
             return errors.join(', ');
           };
           updateValidity = function() {
-            $(element).toggleClass('pristine', inputCtrl.$pristine);
+            if (inputCtrl.$pristine) {
+              return;
+            }
             $(element).toggleClass('dirty', inputCtrl.$dirty);
             $(element).toggleClass('invalid', inputCtrl.$invalid);
             $(element).toggleClass('valid', inputCtrl.$valid);
@@ -47,10 +64,15 @@
               return notificationElt.text(formatErrors());
             }
           };
-          texts = _.extend(defaultTexts, $scope.errorTexts);
-          input = $(element).find('input, textarea, select');
+          texts = angular.extend(fieldValidationSvc.getTexts(), $scope.errorTexts);
+          input = $(element).find('[ng-model]');
+          if (!input.length) {
+            throw 'fieldValidation - ngModel required';
+          }
           inputCtrl = formCtrl[input.attr('name')];
-          label = $(element).find('label');
+          if (!inputCtrl) {
+            throw 'fieldValidation - name attribute required';
+          }
           if ($scope.appendNotificationTo) {
             notificationContainer = $(element).find($scope.appendNotificationTo);
           } else {
@@ -62,25 +84,9 @@
           $scope.$on('VALIDATE_FIELDS', function() {
             return updateValidity();
           });
-          input.on('focusin', function(ev) {
-            return $(element).addClass('has-focus');
-          });
-          input.on('focusout', function(ev) {
-            return $(element).removeClass('has-focus');
-          });
-          input.on('keyup blur', function(ev) {
-            return updateValidity();
-          });
-          if (input[0].tagName === 'SELECT') {
-            input.on('change', function(ev) {
-              return updateValidity();
-            });
-          }
-          if (input.attr('type') === 'checkbox') {
-            return input.on('click', function(ev) {
-              return updateValidity();
-            });
-          }
+          return $scope.$watch((function() {
+            return inputCtrl.$viewValue;
+          }), updateValidity);
         }
       };
     }

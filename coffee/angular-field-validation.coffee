@@ -1,6 +1,30 @@
 fieldValidation = angular.module 'fieldValidation', []
 
-fieldValidation.directive 'fieldValidation', [ ->
+fieldValidation.service 'fieldValidationSvc', [ ->
+  defaultTexts =
+    required:  'This field is required'
+    email:     'Enter a valid email address'
+    max:       'Should be lower'
+    maxlength: 'Too long'
+    min:       'Should be higher'
+    minlength: 'Too short'
+    number:    'Should be numeric'
+    pattern:   'Should respect the pattern'
+    url:       'Enter a valid url'
+
+  notificationElt = '<span class="notification">'
+
+  return{
+    getTexts: ->
+      defaultTexts
+
+    getNotificationElt: ->
+      $(notificationElt)
+
+  }
+]
+
+fieldValidation.directive 'fieldValidation', ['fieldValidationSvc', (fieldValidationSvc) ->
   return {
     require: '^form'
     scope:
@@ -10,28 +34,17 @@ fieldValidation.directive 'fieldValidation', [ ->
 
     link: ($scope, element, attrs, formCtrl)->
 
-      defaultTexts =
-        required:  'This field is required'
-        email:     'Enter a valid email address'
-        max:       'Should be lower'
-        maxlength: 'Too long'
-        min:       'Should be higher'
-        minlength: 'Too short'
-        number:    'Should be numeric'
-        pattern:   'Should respect the pattern'
-        url:       'Enter a valid url'
-
-      notificationElt = $('<span class="notification">')
+      notificationElt = fieldValidationSvc.getNotificationElt()
 
       formatErrors = ->
         errors = []
-        _.each inputCtrl.$error, (value, key)->
+        angular.forEach inputCtrl.$error, (value, key)->
           if value
             errors.push texts[key]
         errors.join(', ')
 
       updateValidity = ->
-        $(element).toggleClass 'pristine', inputCtrl.$pristine
+        return if inputCtrl.$pristine
         $(element).toggleClass 'dirty', inputCtrl.$dirty
         $(element).toggleClass 'invalid', inputCtrl.$invalid
         $(element).toggleClass 'valid', inputCtrl.$valid
@@ -40,11 +53,12 @@ fieldValidation.directive 'fieldValidation', [ ->
         else
           notificationElt.text formatErrors()
 
-      texts = _.extend defaultTexts, $scope.errorTexts
+      texts = angular.extend fieldValidationSvc.getTexts(), $scope.errorTexts
 
-      input = $(element).find 'input, textarea, select'
+      input = $(element).find '[ng-model]'
+      throw 'fieldValidation - ngModel required' unless input.length
       inputCtrl = formCtrl[input.attr('name')]
-      label = $(element).find 'label'
+      throw 'fieldValidation - name attribute required' unless inputCtrl
 
       if $scope.appendNotificationTo
         notificationContainer = $(element).find($scope.appendNotificationTo)
@@ -57,21 +71,7 @@ fieldValidation.directive 'fieldValidation', [ ->
       $scope.$on 'VALIDATE_FIELDS', ->
         updateValidity()
 
-      input.on 'focusin', (ev)->
-        $(element).addClass 'has-focus'
-      input.on 'focusout', (ev)->
-        $(element).removeClass 'has-focus'
-
-      input.on 'keyup blur', (ev)->
-        updateValidity()
-
-      if input[0].tagName == 'SELECT'
-        input.on 'change', (ev)->
-          updateValidity()
-
-      if input.attr('type') == 'checkbox'
-        input.on 'click', (ev)->
-          updateValidity()
+      $scope.$watch (-> inputCtrl.$viewValue), updateValidity
 
   }
 ]
