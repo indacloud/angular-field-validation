@@ -5,6 +5,9 @@ fieldValidation.directive 'fieldValidation', [ ->
     require: '^form'
     scope:
       errorTexts: '='
+      useDataAttribute: '='
+      appendNotificationTo: '@'
+
     link: ($scope, element, attrs, formCtrl)->
 
       defaultTexts =
@@ -20,33 +23,55 @@ fieldValidation.directive 'fieldValidation', [ ->
 
       notificationElt = $('<span class="notification">')
 
-      getErrors = (ctrl)->
+      formatErrors = ->
         errors = []
-        _.each ctrl.$error, (value, key)->
+        _.each inputCtrl.$error, (value, key)->
           if value
             errors.push texts[key]
         errors.join(', ')
+
+      updateValidity = ->
+        $(element).toggleClass 'pristine', inputCtrl.$pristine
+        $(element).toggleClass 'dirty', inputCtrl.$dirty
+        $(element).toggleClass 'invalid', inputCtrl.$invalid
+        $(element).toggleClass 'valid', inputCtrl.$valid
+        if $scope.useDataAttribute
+          notificationContainer.attr 'data-error-text', formatErrors()
+        else
+          notificationElt.text formatErrors()
 
       texts = _.extend defaultTexts, $scope.errorTexts
 
       input = $(element).find 'input, textarea, select'
       inputCtrl = formCtrl[input.attr('name')]
       label = $(element).find 'label'
-      $(element).append notificationElt
 
-      # focus handle
+      if $scope.appendNotificationTo
+        notificationContainer = $(element).find($scope.appendNotificationTo)
+      else
+        notificationContainer = $(element)
+
+      if !$scope.useDataAttribute
+        notificationContainer.append notificationElt
+
+      $scope.$on 'VALIDATE_FIELDS', ->
+        updateValidity()
+
       input.on 'focusin', (ev)->
         $(element).addClass 'has-focus'
       input.on 'focusout', (ev)->
         $(element).removeClass 'has-focus'
 
-      input.on 'change keyup blur', (ev)->
-        $(element).toggleClass 'pristine', inputCtrl.$pristine
-        $(element).toggleClass 'dirty', inputCtrl.$dirty
-        $(element).toggleClass 'invalid', inputCtrl.$invalid
-        $(element).toggleClass 'valid', inputCtrl.$valid
+      input.on 'keyup blur', (ev)->
+        updateValidity()
 
-        notificationElt.text getErrors(inputCtrl)
+      if input[0].tagName == 'SELECT'
+        input.on 'change', (ev)->
+          updateValidity()
+
+      if input.attr('type') == 'checkbox'
+        input.on 'click', (ev)->
+          updateValidity()
 
   }
 ]

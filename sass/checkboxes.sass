@@ -1,0 +1,39 @@
+
+.checkbox,
+.checkbox-inline,
+.radio,
+.radio-inline
+  padding-left: 0px
+  input[type="checkbox"],
+  input[type="radio"]
+    opacity: 0
+    display: none
+  label
+    padding-left: 0px
+    cursor: pointer
+  .label-text
+    position: relative
+  .label-text:before
+    content: ''
+    background-size: 100%
+    height: 1.3em
+    width: 1.3em
+    top: 0.2em
+    margin-right: 0.2em
+    display: inline-block
+    position: relative
+
+  input:disabled + .label-text
+    cursor: not-allowed
+    opacity: 0.6
+
+.checkbox,
+.checkbox-inline
+  .label-text:before
+    content: ''
+    background-image: url(../icons/SVG/check_box_outline_blank.svg)
+    #box
+      fill: gray
+  input:checked + .label-text:before
+    content: ''
+    background-image: url(../icons/SVG/check_box.svg)

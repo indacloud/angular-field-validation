@@ -5,7 +5,11 @@
 
   myApp.controller('myController', [
     '$scope', function($scope) {
-      return $scope.form = {};
+      $scope.form = {};
+      $scope.emailRequired = true;
+      return $scope.onSubmit = function() {
+        return $scope.$broadcast('VALIDATE_FIELDS');
+      };
     }
   ]);
 

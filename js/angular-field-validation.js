@@ -8,10 +8,12 @@
       return {
         require: '^form',
         scope: {
-          errorTexts: '='
+          errorTexts: '=',
+          useDataAttribute: '=',
+          appendNotificationTo: '@'
         },
         link: function($scope, element, attrs, formCtrl) {
-          var defaultTexts, getErrors, input, inputCtrl, label, notificationElt, texts;
+          var defaultTexts, formatErrors, input, inputCtrl, label, notificationContainer, notificationElt, texts, updateValidity;
           defaultTexts = {
             required: 'This field is required',
             email: 'Enter a valid email address',
@@ -24,34 +26,61 @@
             url: 'Enter a valid url'
           };
           notificationElt = $('<span class="notification">');
-          getErrors = function(ctrl) {
+          formatErrors = function() {
             var errors;
             errors = [];
-            _.each(ctrl.$error, function(value, key) {
+            _.each(inputCtrl.$error, function(value, key) {
               if (value) {
                 return errors.push(texts[key]);
               }
             });
             return errors.join(', ');
           };
+          updateValidity = function() {
+            $(element).toggleClass('pristine', inputCtrl.$pristine);
+            $(element).toggleClass('dirty', inputCtrl.$dirty);
+            $(element).toggleClass('invalid', inputCtrl.$invalid);
+            $(element).toggleClass('valid', inputCtrl.$valid);
+            if ($scope.useDataAttribute) {
+              return notificationContainer.attr('data-error-text', formatErrors());
+            } else {
+              return notificationElt.text(formatErrors());
+            }
+          };
           texts = _.extend(defaultTexts, $scope.errorTexts);
           input = $(element).find('input, textarea, select');
           inputCtrl = formCtrl[input.attr('name')];
           label = $(element).find('label');
-          $(element).append(notificationElt);
+          if ($scope.appendNotificationTo) {
+            notificationContainer = $(element).find($scope.appendNotificationTo);
+          } else {
+            notificationContainer = $(element);
+          }
+          if (!$scope.useDataAttribute) {
+            notificationContainer.append(notificationElt);
+          }
+          $scope.$on('VALIDATE_FIELDS', function() {
+            return updateValidity();
+          });
           input.on('focusin', function(ev) {
             return $(element).addClass('has-focus');
           });
           input.on('focusout', function(ev) {
             return $(element).removeClass('has-focus');
           });
-          return input.on('change keyup blur', function(ev) {
-            $(element).toggleClass('pristine', inputCtrl.$pristine);
-            $(element).toggleClass('dirty', inputCtrl.$dirty);
-            $(element).toggleClass('invalid', inputCtrl.$invalid);
-            $(element).toggleClass('valid', inputCtrl.$valid);
-            return notificationElt.text(getErrors(inputCtrl));
+          input.on('keyup blur', function(ev) {
+            return updateValidity();
           });
+          if (input[0].tagName === 'SELECT') {
+            input.on('change', function(ev) {
+              return updateValidity();
+            });
+          }
+          if (input.attr('type') === 'checkbox') {
+            return input.on('click', function(ev) {
+              return updateValidity();
+            });
+          }
         }
       };
     }

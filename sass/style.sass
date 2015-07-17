@@ -7,8 +7,27 @@ main
   max-width: 900px
   margin: 30px auto
 
+.row
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+  & > div
+    flex: 0 0 400px
+  & > .info
+    flex: 1 1 auto
+    margin-left: 20px
+
+.info
+  display: inline-block
+  padding: 5px
+  background: whitesmoke
+  border: 1px solid lightgray
+  border-radius: 4px
+  font-size: 0.8em
+  margin-bottom: 8px
+
+
 form
-  max-width: 400px
   label
     display: block
     line-height: 1.3em
@@ -19,22 +38,11 @@ form
   input[type="date"],
   input[type="url"],
   input[type="number"],
-  input[type="password"]
-    display: block
-    width: 100%
-    border-style: solid
-    border-width: 0 0 2px 0
-    border-color: lightgray
-    padding: 4px 10px
-    font-size: 1em
-
+  input[type="password"],
+  select,
   textarea
     display: block
     width: 100%
-    border-style: solid
-    border-width: 0 0 2px 2px
-    border-color: lightgray
-    font-size: 1em
 
   [field-validation]
     margin: 0 0 5px
@@ -42,12 +50,13 @@ form
       display: block
       font-size: 0.8em
       line-height: 1.6em
-      min-height: 1.6em
       color: red
       font-style: italic
     &.invalid
       label::after
-        content: "x"
+        content: attr(data-error-text)
         display: inline-block
         color: red
         margin-left: 4px
+        font-size: 0.7em
+        line-height: 1em
